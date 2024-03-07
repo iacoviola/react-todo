@@ -4,7 +4,6 @@ import todo_logo from './assets/todo.png'
 import react_logo from './assets/react.svg'
 
 interface todo {
-    edit: boolean;
     done: boolean;
     desc: string;
 }
@@ -21,7 +20,7 @@ function App() {
 
         set_item_list((old_list) => {
             if (text && pippo.current){
-                old_list = [{edit: false, done: false, desc: text}, ...old_list];
+                old_list = [{done: false, desc: text}, ...old_list];
                 pippo.current.value = "";
             }
 
@@ -50,6 +49,7 @@ function App() {
 
         const divelement = document.getElementById(`${index}-div`) as HTMLDivElement;
         const edit = (divelement).children[2] as HTMLButtonElement;
+        const input = (divelement).children[1] as HTMLInputElement;
 
         if(edit.innerText === "Modifica"){
             edit.innerText = "Salva";
@@ -57,20 +57,10 @@ function App() {
             edit.innerText = "Modifica";
         }
 
-        set_item_list((old_list) => old_list.map((x, i) => {
-            if (i === index){
-                return {
-                    ...x,
-                    edit: !x.edit//(!x.done) ? !x.edit//(!x.done) ? !x.edit : x.edit: x.edit
-                };
-            }
-            return x;
-        }));
-
+        input.disabled = !input.disabled;
     }
 
-    function on_input_change(event: React.ChangeEvent<HTMLInputElement>){
-        const index = parseInt(event.target.id.split("-")[0]);
+    const on_input_change = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const val = event.target.value;
 
         set_item_list((old_list) => old_list.map((x, i) => {
@@ -105,7 +95,7 @@ function App() {
                     item_list.map((x, i) => 
                     <div key={i} id={`${i}-div`} className={"todo-element"}>
                         <input className="checkbox"  onChange={() => toggle_done(i)} checked={x.done} type='checkbox'></input>
-                        <input onChange={on_input_change} id={`${i}-input`} type='text' disabled={x.edit ? false : true} className={`list-item ${x.done ? 'done' : ''}`} value={x.desc}></input>
+                        <input onChange={on_input_change(i)} type='text' disabled={true} className={`list-item ${x.done ? 'done' : ''}`} value={x.desc}></input>
                         <button className="edit-button" onClick={() => toggle_edit(i)}>Modifica</button>
                         <button className="delete-button" onClick={() => set_item_list((old_list) => old_list.filter((_, index) => index != i))}>Rimuovi</button>
                     </div>
@@ -115,11 +105,5 @@ function App() {
         </div>
     )
 }
-
-/*
-<input className="checkbox" onChange={() => toggle_done(i)} checked={x.done} type='checkbox'></input>
-<div className={`list-item ${x.done ? 'done' : ''}`}>{x.desc}</div>
-<button className="delete-button" onClick={() => set_item_list((old_list) => old_list.filter((_, index) => index != i))}>Rimuovi</button>
-*/
 
 export default App
